@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CS2 Team Roster & Stats Tracker</title>
+  <meta name="description" content="Адаптивный трекер статистики и ростера киберспортивной команды по Counter-Strike 2.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Background Glow & Grid -->
+  <div class="bg-fx-grid"></div>
+  <div class="bg-fx-glow"></div>
+
+  <!-- Main Container -->
+  <div class="app-container">
+    
+    <!-- HEADER -->
+    <header class="app-header">
+      <div class="header-main">
+        <div class="team-brand">
+          <!-- CS2 Logo SVG -->
+          <div class="cs2-logo" title="Counter-Strike 2 Stats Tracker">
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="64" height="64" rx="14" fill="#151922"/>
+              <path d="M12 18H52L46 32H20L17 46H48" stroke="#e4891b" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M46 32L38 46" stroke="#f0f4f8" stroke-width="4" stroke-linecap="round"/>
+              <circle cx="50" cy="18" r="3.5" fill="#f0f4f8"/>
+              <circle cx="16" cy="46" r="3.5" fill="#e4891b"/>
+            </svg>
+          </div>
+
+          <div class="team-title-wrap">
+            <span class="team-tag-badge">CS2 ROSTER & STATS</span>
+            <div class="team-name-row">
+              <h1 id="teamNameHeading" class="team-name" title="Нажмите, чтобы изменить название команды">Team Dominance</h1>
+              <button id="editTeamNameBtn" class="btn-icon" title="Переименовать команду" aria-label="Переименовать команду">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Global Actions Toolbar -->
+        <div class="header-actions">
+          <button id="openMatchModalBtn" class="btn btn-accent btn-glow">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+            <span>Внести матч</span>
+          </button>
+
+          <button id="exportBtn" class="btn btn-secondary" title="Экспорт данных команды в файл JSON">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Экспорт JSON</span>
+          </button>
+
+          <label class="btn btn-secondary" title="Импорт данных команды из файла JSON">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <span>Импорт JSON</span>
+            <input type="file" id="importInput" accept=".json" style="display: none;">
+          </label>
+
+          <button id="loadSampleBtn" class="btn btn-outline" title="Загрузить пример киберспортивного ростера">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polygon points="10 8 16 12 10 16 10 8"></polygon>
+            </svg>
+            <span>Демо-состав</span>
+          </button>
+
+          <button id="resetAllBtn" class="btn btn-danger" title="Полный сброс всех сохраненных данных">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+            <span>Сброс</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- SUMMARY DASHBOARD -->
+    <section class="dashboard-section" aria-label="Сводная статистика команды">
+      <div class="stats-grid">
+        
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-label">Состав команды</span>
+            <span class="stat-icon text-muted">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            </span>
+          </div>
+          <div class="stat-value" id="dashTotalPlayers">0</div>
+          <div class="stat-subtext" id="dashActiveRoles">Игроков в ростере</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-label">Сыграно матчей</span>
+            <span class="stat-icon text-muted">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+            </span>
+          </div>
+          <div class="stat-value" id="dashTotalMatches">0</div>
+          <div class="stat-subtext" id="dashAvgMatches">0.0 в среднем на игрока</div>
+        </div>
+
+        <div class="stat-card stat-card-highlight">
+          <div class="stat-card-header">
+            <span class="stat-label">Командный K/D</span>
+            <span class="stat-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="22" y1="12" x2="18" y2="12"></line><line x1="6" y1="12" x2="2" y2="12"></line><line x1="12" y1="6" x2="12" y2="2"></line><line x1="12" y1="22" x2="12" y2="18"></line></svg>
+            </span>
+          </div>
+          <div class="stat-value kd-val" id="dashTeamKD">0.00</div>
+          <div class="stat-subtext" id="dashKDSub">Соотношение убийств к смертям</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-label">Kills / Deaths / Assists</span>
+            <span class="stat-icon text-muted">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+            </span>
+          </div>
+          <div class="stat-value stat-value-kda">
+            <span id="dashKills" class="text-kills">0</span>
+            <span class="kda-sep">/</span>
+            <span id="dashDeaths" class="text-deaths">0</span>
+            <span class="kda-sep">/</span>
+            <span id="dashAssists" class="text-assists">0</span>
+          </div>
+          <div class="stat-subtext" id="dashKDA">Командный KDA: 0.00</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-label">Клатчи & Эйсы</span>
+            <span class="stat-icon text-accent">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>
+            </span>
+          </div>
+          <div class="stat-value">
+            <span id="dashClutches" class="text-accent" title="Всего клатчей 1vX">0</span>
+            <span class="kda-sep" style="font-weight: 300;">|</span>
+            <span id="dashAces" class="text-gold" title="Всего эйсов (5k)">0</span>
+          </div>
+          <div class="stat-subtext">1vX Клатчи & Эйсы команды</div>
+        </div>
+
+        <div class="stat-card stat-card-mvp">
+          <div class="stat-card-header">
+            <span class="stat-label">MVP Команды</span>
+            <span class="stat-icon text-gold">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+            </span>
+          </div>
+          <div class="stat-value mvp-name" id="dashMvpName">—</div>
+          <div class="stat-subtext" id="dashMvpStat">Лидер состава по K/D</div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- MAIN SECTION: ROSTER & STATS TABLE -->
+    <main class="roster-section">
+      <div class="section-header-bar">
+        <div class="section-title-group">
+          <h2>Состав команды</h2>
+          <span class="badge" id="rosterCountBadge">0 бойцов</span>
+        </div>
+
+        <!-- Add Player Form -->
+        <form id="addPlayerForm" class="add-player-form" autocomplete="off">
+          <div class="input-field-group">
+            <input 
+              type="text" 
+              id="newPlayerNick" 
+              placeholder="Никнейм игрока (напр. s1mple)" 
+              required 
+              maxlength="24"
+              class="form-input">
+          </div>
+          <div class="input-field-group">
+            <select id="newPlayerRole" class="form-select">
+              <option value="Снайпер (AWP)">Снайпер (AWP)</option>
+              <option value="Капитан (IGL)">Капитан (IGL)</option>
+              <option value="Рифлер" selected>Рифлер</option>
+              <option value="Энтри-фрагер">Энтри-фрагер</option>
+              <option value="Саппорт">Саппорт</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-accent">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>Добавить игрока</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Quick Search & Help hint -->
+      <div class="table-utility-bar">
+        <div class="search-input-wrapper">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="rosterSearchInput" placeholder="Поиск по никнейму или роли..." class="search-input">
+        </div>
+        <div class="table-hint">
+          <span class="hint-bullet">•</span> Кликните на заголовок для сортировки
+          <span class="hint-bullet">•</span> Числа можно вводить напрямую или кнопками +/-
+        </div>
+      </div>
+
+      <!-- Table Container with Smooth Scroll -->
+      <div class="table-responsive">
+        <table class="roster-table" id="rosterTable">
+          <thead>
+            <tr>
+              <th data-sort="name" class="sortable">
+                <div class="th-content"><span>Игрок</span><span class="sort-indicator"></span></div>
+              </th>
+              <th data-sort="role" class="sortable">
+                <div class="th-content"><span>Роль</span><span class="sort-indicator"></span></div>
+              </th>
+              <th data-sort="matches" class="sortable text-center">
+                <div class="th-content center"><span>Матчи</span><span class="sort-indicator"></span></div>
+              </th>
+              <th data-sort="kills" class="sortable text-center">
+                <div class="th-content center"><span>Kills</span><span class="sort-indicator"></span></div>
+              </th>
+              <th data-sort="deaths" class="sortable text-center">
+                <div class="th-content center"><span>Deaths</span><span class="sort-indicator"></span></div>
+              </th>
+              <th data-sort="assists" class="sortable text-center">
+                <div class="th-content center"><span>Assists</span><span class="sort-indicator"></span></div>
+              </th>
+              <th data-sort="kd" class="sortable text-center active-sort">
+                <div class="th-content center"><span>K/D</span><span class="sort-indicator">▼</span></div>
+              </th>
+              <th data-sort="kda" class="sortable text-center">
+                <div class="th-content center"><span>KDA</span><span class="sort-indicator"></span></div>
+              </th>
+              <th data-sort="kpm" class="sortable text-center">
+                <div class="th-content center"><span>K/M</span><span class="sort-indicator"></span></div>
+              </th>
+              <th data-sort="clutches" class="sortable text-center">
+                <div class="th-content center"><span>Clutches</span><span class="sort-indicator"></span></div>
+              </th>
+              <th data-sort="aces" class="sortable text-center">
+                <div class="th-content center"><span>Aces</span><span class="sort-indicator"></span></div>
+              </th>
+              <th class="text-right">Действия</th>
+            </tr>
+          </thead>
+          <tbody id="rosterTableBody">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+
+        <!-- EMPTY STATE -->
+        <div id="emptyState" class="empty-state hidden">
+          <div class="empty-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#8a94a6" stroke-width="1.5">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
+          </div>
+          <h3>В составе пока нет игроков</h3>
+          <p>Добавьте первых тиммейтов через форму выше или нажмите «Демо-состав», чтобы оценить функционал.</p>
+          <button id="emptyLoadSampleBtn" class="btn btn-accent">Загрузить демо-состав CS2</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- SECTION: MATCH HISTORY -->
+    <section class="history-section" aria-label="История матчей">
+      <div class="section-header-bar">
+        <div class="section-title-group">
+          <h2>История последних матчей</h2>
+          <span class="badge" id="matchesCountBadge">0 каток</span>
+        </div>
+        <button id="quickRecordMatchBtn" class="btn btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          <span>Записать матч</span>
+        </button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="history-table" id="historyTable">
+          <thead>
+            <tr>
+              <th>Дата и время</th>
+              <th>Игрок</th>
+              <th>Карта</th>
+              <th>Результат</th>
+              <th class="text-center">K / D / A</th>
+              <th class="text-center">K/D матча</th>
+              <th class="text-center">Клатчи</th>
+              <th class="text-center">Эйсы</th>
+              <th class="text-right">Действие</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+
+        <div id="emptyHistoryState" class="empty-history hidden">
+          <p>Матчи еще не записывались. Воспользуйтесь кнопкой «Внести матч», чтобы добавить свежую катку!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="app-footer">
+      <div class="footer-info">
+        <span>CS2 Team Roster & Stats Tracker • Чистый HTML5/CSS3/Vanilla JS</span>
+        <span class="footer-sep">|</span>
+        <span>Готово для деплоя на GitHub Pages</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- MODAL: RECORD PLAYED MATCH -->
+  <div id="matchModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-window">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="team-tag-badge">CS2 MATCH LOG</span>
+          <h3 id="modalTitle">Записать результат матча</h3>
+        </div>
+        <button id="closeMatchModalBtn" class="modal-close-btn" aria-label="Закрыть">&times;</button>
+      </div>
+
+      <form id="recordMatchForm" class="modal-form">
+        <div class="form-grid">
+          
+          <div class="form-group full-width">
+            <label for="matchPlayerSelect">Выберите игрока команды *</label>
+            <select id="matchPlayerSelect" class="form-select form-input-lg" required>
+              <!-- Filled dynamically with options -->
+            </select>
+          </div>
+
+          <div class="form-group half-width">
+            <label for="matchMapSelect">Карта CS2</label>
+            <select id="matchMapSelect" class="form-select">
+              <option value="Mirage">de_mirage</option>
+              <option value="Inferno">de_inferno</option>
+              <option value="Nuke">de_nuke</option>
+              <option value="Dust II">de_dust2</option>
+              <option value="Anubis">de_anubis</option>
+              <option value="Ancient">de_ancient</option>
+              <option value="Vertigo">de_vertigo</option>
+            </select>
+          </div>
+
+          <div class="form-group half-width">
+            <label>Результат игры</label>
+            <div class="match-result-selector">
+              <label class="result-radio-label result-win">
+                <input type="radio" name="matchResult" value="Победа" checked>
+                <span>Победа</span>
+              </label>
+              <label class="result-radio-label result-loss">
+                <input type="radio" name="matchResult" value="Поражение">
+                <span>Поражение</span>
+              </label>
+              <label class="result-radio-label result-tie">
+                <input type="radio" name="matchResult" value="Ничья">
+                <span>Ничья</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group stat-input-group">
+            <label for="matchKills">Kills (Убийства) *</label>
+            <input type="number" id="matchKills" class="form-input" min="0" max="150" value="18" required>
+          </div>
+
+          <div class="form-group stat-input-group">
+            <label for="matchDeaths">Deaths (Смерти) *</label>
+            <input type="number" id="matchDeaths" class="form-input" min="0" max="150" value="14" required>
+          </div>
+
+          <div class="form-group stat-input-group">
+            <label for="matchAssists">Assists (Ассисты)</label>
+            <input type="number" id="matchAssists" class="form-input" min="0" max="150" value="4">
+          </div>
+
+          <div class="form-group stat-input-group">
+            <label for="matchClutches">Клатчи (1vX)</label>
+            <input type="number" id="matchClutches" class="form-input" min="0" max="20" value="0">
+          </div>
+
+          <div class="form-group stat-input-group">
+            <label for="matchAces">Эйсы (5k)</label>
+            <input type="number" id="matchAces" class="form-input" min="0" max="10" value="0">
+          </div>
+
+        </div>
+
+        <div class="modal-notice">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          <span>При сохранении показатели игрока увеличатся автоматически, а матч запишется в историю (с возможностью отката).</span>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" id="cancelMatchModalBtn" class="btn btn-secondary">Отмена</button>
+          <button type="submit" class="btn btn-accent btn-glow">Записать матч</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- APP SCRIPT -->
+  <script src="script.js"></script>
+</body>
+</html>
